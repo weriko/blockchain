@@ -9,7 +9,7 @@ data model:
     
     
 action: which action will be performed in the network ->
-    add node, actualize node, download blockchain, verify mining hash, make transaction, add block
+    add node, update node, download blockchain, verify mining hash, make transaction, add block
 """
 class NodeAsServer(protocol.Protocol):
     
