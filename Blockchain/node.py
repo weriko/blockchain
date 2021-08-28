@@ -4,6 +4,7 @@ from __future__ import print_function
 import json
 from twisted.internet import reactor, protocol
 import pickle
+from requests import get
 """
 data model:
     
@@ -38,8 +39,10 @@ class NodeAsServer(protocol.Protocol):
         if action=="add_node":
             data["received_from_node"] ="1"
             self.factory.node.add_node(data["node"]) #This should be the ip adress, along with the port of the node (?)
+            
             if received_from_node == "0": #If the data wasnt received by another node, it will emit the data to the network, otherwise, there is no need to do so as another node would have done it already, hopefully
                 self.factory.node.transmit_data(json.dumps(data).encode("ascii"))
+                
                 print("adding node...")
                 print("Transmitting data to other nodes...")
                 
@@ -48,6 +51,8 @@ class NodeAsServer(protocol.Protocol):
             if received_from_node == "0": #If the data wasnt received by another node, it will emit the data to the network, otherwise, there is no need to do so as another node would have done it already, hopefully
                 self.factory.node.transmit_data(json.dumps(data).encode("ascii"))
                 print("adding block...")
+                print(self.factory.node.port)
+                print(self.factory.node.pub_ip)
                 print("Transmitting to other nodes...")
                
             
@@ -93,28 +98,32 @@ class NodeHandler(protocol.Protocol): #Used when node sends data to other nodes
 class EchoFactory(protocol.ClientFactory):
     protocol = NodeHandler
     
-    def __init__(self,data=None):
+    def __init__(self,data=None,ip=None,port=None):
         self.data = data or "None"
         
 
     def clientConnectionFailed(self, connector, reason):
-        print("Connection failed with node")
+        print("Connection failed with node",reason)
        
     
     def clientConnectionLost(self, connector, reason):
         print("Connection closed with node")
        
 class Node:
-    def __init__(self,node_list =None):
+    def __init__(self,node_list =None, port = 9000, pub_ip =None):
         if not node_list:
             self.node_list = []
         else:
             self.node_list = node_list
+        self.port = port
+        if not pub_ip:
+            pub_ip = get("https://api.ipify.org").text
+        self.pub_ip=pub_ip 
         
     def start_as_server(self):
         self.factory = NodeServerFactory(node=self)
         
-        reactor.listenTCP(9002,self.factory)
+        reactor.listenTCP(self.port,self.factory)
        
         reactor.run()
     
@@ -125,14 +134,17 @@ class Node:
         
     def transmit_data(self,data):
         print(self.node_list)
-        for node in self.node_list:
-            
-            f = EchoFactory(data = data)
-            reactor.connectTCP(node, 9002, f)
-        
-            
-            
-            pass
+        for n in self.node_list:
+            try:
+                if self.pub_ip!=n[0] or self.port!=n[1]:
+                
+                    f = EchoFactory(data = data,ip=n[0],port=n[1])
+                    reactor.connectTCP(n[0], n[1], f)
+                   
+            except:
+                pass
+                
+                
     
     
     def start(self):
@@ -144,8 +156,13 @@ class Node:
 
 
 def main():
-    node = Node(node_list=["localhost"])
-    node.start()
+    with open("nodes.json","r") as nd:
+        j = json.load(nd)["data"]
+        print(j)
+        node = Node(node_list=j, port = 9000, pub_ip = None)
+        
+        print("Starting...")
+        node.start()
     
     
     
