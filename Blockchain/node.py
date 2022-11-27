@@ -266,11 +266,13 @@ class Node:
         print("=========THIS IS A TEST=============")
         print(self.get_nodes())
 
-
+    def update_peers(self):
+        self.ping_and_remove_nodes()
+        self.choose_connect()
     def start(self):
         self.connect_to_peers()
         scheduler = BackgroundScheduler()
-        scheduler.add_job(self.testing, 'interval', seconds=5)
+        scheduler.add_job(self.update_peers, 'interval', seconds=10)
         scheduler.start()
         print("Peers ", self.get_nodes() )
         print(self.id)
