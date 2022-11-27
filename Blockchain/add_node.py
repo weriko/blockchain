@@ -19,9 +19,10 @@ class EchoClient(protocol.Protocol):
     
     def connectionMade(self):
         global node_port
+        global node_ip #dont use globals
         data = {"action":"add_node",
                 "received_from_node":"0",
-                "node":["localhost",node_port],
+                "node":[node_ip,node_port],
                 "timestamp":str(time.time())}
         self.transport.write(json.dumps(data).encode())
     
@@ -49,13 +50,18 @@ class EchoFactory(protocol.ClientFactory):
 def main():
     f = EchoFactory()
     global node_port #Dont do this
+    global node_ip
+    node_ip = "localhost"
     node_port = 9000
     port = 9000
     args = sys.argv
+    ip = "localhost"
     if len(args)>1:
-        port = int(args[1])
-        node_port = int(args[2])
-    reactor.connectTCP("localhost", port, f)
+        port = int(args[2])
+        node_port = int(args[4])
+        node_ip = args[3]
+        ip = args[1]
+    reactor.connectTCP(ip, port, f)
     reactor.run()
     input()
  
