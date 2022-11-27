@@ -1,17 +1,9 @@
 from __future__ import annotations
 from bitcoinutils.setup import setup
-from bitcoinutils.utils import to_satoshis
 from bitcoinutils.transactions import Transaction, TxInput, TxOutput
 from bitcoinutils.keys import P2pkhAddress, PrivateKey
 from bitcoinutils.script import Script
 
-import ecdsa
-from dataclasses import dataclass, field
-from bitcoinutils.setup import setup
-import hashlib as hs
-from bitcoinutils.keys import P2pkhAddress, PrivateKey
-from collections import deque
-import random
 
 
 def create_tx(priv:str|PrivateKey, tx_ins:list, tx_outs:list, net:str='testnet', iswif = True):
