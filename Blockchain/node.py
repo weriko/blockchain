@@ -229,7 +229,7 @@ class Node:
             self.add_node(n)
 
 
-    def choose_connect(num=99):
+    def choose_connect(self, num=99):
         enodes = connect_db.explore_nodes()
         n = min(len(enodes), config.NETWORK_CONSTANTS["node_peers"], num)
         nodes = random.sample(enodes, config.NETWORK_CONSTANTS["node_peers"]- n ) #Implement better node selection other than random. maybe
