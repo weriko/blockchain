@@ -19,7 +19,6 @@ action: which action will be performed in the network ->
     add node, update node, download blockchain, verify mining hash, make transaction, add block
 """
 
-#
 
 
 class NodeAsServer(protocol.Protocol):
@@ -35,7 +34,8 @@ class NodeAsServer(protocol.Protocol):
             print(data)
             data = json.loads(data)
         
-        except:
+        except Exception as e:
+            print(e)
             self.transport.loseConnection()#Maybe dont handle this?
 
         action=None
