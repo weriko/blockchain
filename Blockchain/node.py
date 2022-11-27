@@ -96,11 +96,20 @@ class NodeAsServer(protocol.Protocol):
                 data["received_from_node"] = "1"
 
                 self.factory.node.add_node(data["node"])
+                #self.factory.node.transmit_data(
+                 #   json.dumps(data).encode("ascii"))
+
+                print("adding node...")
+                
+
+            if action == "message":
+                data["received_from_node"] = "1"
+
                 self.factory.node.transmit_data(
                     json.dumps(data).encode("ascii"))
 
-                print("adding node...")
-                print("Transmitting data to other nodes...")
+                
+                print("message received : ", data.get("message"))
 
             elif action == "add_block":
                 data["received_from_node"] = "1"
@@ -189,9 +198,11 @@ class Node:
         reactor.run()
 
     def add_node(self, node):
+        
         if len(self.node_list)< config.NETWORK_CONSTANTS["node_peers_max"]+1:
             ip, port = node[0], node[1]
-            self.node_list.append(node)
+            if node not in self.node_list:
+                self.node_list.append(node) #fix this for efficiency
             connect_db.insert_node(ip, port)
             self.add_explore_node(node)
 
@@ -283,7 +294,7 @@ class Node:
     def start(self):
         self.connect_to_peers()
         scheduler = BackgroundScheduler(job_defaults={'max_instances': 10})
-        scheduler.add_job(self.update_peers, 'interval', seconds=20)
+        scheduler.add_job(self.update_peers, 'interval', seconds=600)
         scheduler.start()
         print("Peers ", self.get_nodes())
         print(self.id)
