@@ -23,7 +23,7 @@ def insert_node(ip, port):
         connect.commit()
         db.close()
     except Exception as E:
-        print("errors: ",E)
+        print("insert error: ",E)
         if 'no such table' in E.args[0]:
             setup()
             
@@ -40,7 +40,7 @@ def remove_node(ip, port):
         connect.commit()
         db.close()
     except Exception as E:
-        print("errors: ",E)
+        print("remove node error: ",E)
         if 'no such table' in E.args[0]:
             setup()
             
@@ -56,7 +56,7 @@ def remove_explore_node(ip, port):
         connect.commit()
         db.close()
     except Exception as E:
-        print("errors: ",E)
+        print("remove explore error: ",E)
         if 'no such table' in E.args[0]:
             setup()
             
@@ -109,7 +109,7 @@ def explore_nodes():
 
 
     except Exception as E:
-        
+        print("explore node error ", E)
         setup()
 def get_nodes():
     connect = sqlite3.connect("dbs/nodes.db")
@@ -129,6 +129,7 @@ def get_nodes():
 
 
     except Exception as E:
+        print("get node error", E)
         
         setup()
         print(E)
