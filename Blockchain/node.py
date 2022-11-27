@@ -141,7 +141,7 @@ class EchoFactory(protocol.ClientFactory):
        
     
     def clientConnectionLost(self, connector, reason):
-        print("Connection closed with node")
+        print("Connection closed with node", reason)
        
 class Node:
     def __init__(self,node_list =None, port = 9000, pub_ip =None):
@@ -240,7 +240,7 @@ class Node:
 
     def start(self):
         self.connect_to_peers()
-     
+        print("Peers ", self.get_nodes() )
         self.start_as_server()
         
             
