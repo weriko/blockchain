@@ -153,7 +153,8 @@ class EchoFactory(protocol.ClientFactory):
         
 
     def clientConnectionFailed(self, connector, reason):
-        print("Connection failed with node",reason)
+        print("Connection failed with node", reason)
+        raise ValueError("connection failed")
        
     
     def clientConnectionLost(self, connector, reason):
