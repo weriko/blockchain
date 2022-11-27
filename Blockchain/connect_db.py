@@ -118,7 +118,7 @@ def get_nodes():
         db.execute("SELECT * FROM nodes")
         nodes = []
         for i in db.fetchall():
-            nodes.apppend(i)
+            nodes.append(i)
 
 
         nodes.sort(key = lambda x: x[2])
