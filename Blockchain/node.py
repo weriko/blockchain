@@ -92,7 +92,7 @@ class NodeAsServer(protocol.Protocol):
                 self.factory.node.transmit_data(json.dumps(data).encode("ascii"))
                 print("adding block...")
                 print(self.factory.node.port)
-                print(self.factory.node.pub_ip)
+                print(self.factory.node.ip)
                 print("Transmitting to other nodes...")
                
             
@@ -156,7 +156,7 @@ class Node:
         self.port = port
         if not pub_ip:
             pub_ip = get("https://api.ipify.org").text
-        self.pub_ip=pub_ip 
+        self.ip=pub_ip 
         
     def start_as_server(self):
         self.factory = NodeServerFactory(node=self)
@@ -187,7 +187,7 @@ class Node:
         for n in self.node_list:
             if n[0] not in nodes_seen:
                 try:
-                    if self.pub_ip!=n[0] or self.port!=n[1]:
+                    if self.ip!=n[0] or self.port!=n[1]:
                     
                         f = EchoFactory(data = data,ip=n[0],port=n[1])
                         reactor.connectTCP(n[0], n[1], f)
@@ -199,7 +199,7 @@ class Node:
         is_connected = []
         for n in self.node_list:
             try:
-                if self.pub_ip!=n[0] or self.port!=n[1]:
+                if self.ip!=n[0] or self.port!=n[1]:
 
                     f = EchoFactory(data = {"ping":0},ip=n[0],port=n[1])
                     reactor.connectTCP(n[0], n[1], f)
@@ -212,7 +212,7 @@ class Node:
     def ping_and_remove_nodes(self):
          for n in self.node_list:
             try:
-                if self.pub_ip!=n[0] or self.port!=n[1]:
+                if self.ip!=n[0] or self.port!=n[1]:
 
                     f = EchoFactory(data = {"ping":0},ip=n[0],port=n[1])
                     reactor.connectTCP(n[0], n[1], f)
