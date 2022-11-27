@@ -48,13 +48,12 @@ class NodeAsServer(protocol.Protocol):
 
     def dataReceived(self, data):
 
-        try:
+       
+        data = json.loads(data)
 
-            data = json.loads(data)
-
-        except Exception as e:
+        """ except Exception as e:
             print(e)
-            self.transport.loseConnection()  # Maybe dont handle this?
+            self.transport.loseConnection()  # Maybe dont handle this?"""
         print(type(data))
         if data.get("broadcast") != "false":
             action = None
