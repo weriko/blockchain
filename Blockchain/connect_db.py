@@ -149,8 +149,3 @@ def view_table(table):
     finally:
         if connect:
             connect.close()
-insert_node("1231", "2")
-insert_explore_node("12321","2",10)
-
-view_table("explore_nodes")
-view_table("nodes")

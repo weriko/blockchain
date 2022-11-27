@@ -11,6 +11,9 @@ import pickle
 import random
 from requests import get
 import time
+import uuid
+import pathlib
+
 """
 data model:
     
@@ -151,7 +154,16 @@ class Node:
         if not pub_ip:
             pub_ip = get("https://api.ipify.org").text
         self.ip=pub_ip 
+        self.id = self.get_id()
         
+
+    def get_id(self):
+        file = pathlib.Path("node_id.id")
+        if file.exists ():
+            with open("node_id.id","r") as f:
+                return f.read()
+        return uuid.uuid4()
+                
     def start_as_server(self):
         self.factory = NodeServerFactory(node=self)
         
@@ -241,6 +253,7 @@ class Node:
     def start(self):
         self.connect_to_peers()
         print("Peers ", self.get_nodes() )
+        print(self.id)
         self.start_as_server()
         
             
