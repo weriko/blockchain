@@ -24,8 +24,8 @@ def insert_node(ip, port):
         db.close()
     except Exception as E:
         print("insert error: ",E)
-        if 'no such table' in E.args[0]:
-            setup()
+        
+        setup()
             
     finally:
         if connect:
@@ -111,6 +111,7 @@ def explore_nodes():
     except Exception as E:
         print("explore node error ", E)
         setup()
+
 def get_nodes():
     connect = sqlite3.connect("dbs/nodes.db")
     db = connect.cursor()
@@ -119,10 +120,6 @@ def get_nodes():
         nodes = []
         for i in db.fetchall():
             nodes.append(i)
-
-
-        nodes.sort(key = lambda x: x[2])
-        
             
         db.close()
         return nodes
