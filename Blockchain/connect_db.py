@@ -98,7 +98,7 @@ def explore_nodes(ip, port):
         db.execute("SELECT * FROM explore_nodes")
         nodes = []
         for i in db.fetchall():
-            nodes.apppend(i)
+            nodes.append(i)
 
 
         nodes.sort(key = lambda x: x[2])
