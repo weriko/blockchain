@@ -269,6 +269,7 @@ class Node:
     def update_peers(self):
         self.ping_and_remove_nodes()
         self.choose_connect()
+        print("Updating nodes -> ", self.get_nodes())
     def start(self):
         self.connect_to_peers()
         scheduler = BackgroundScheduler()
