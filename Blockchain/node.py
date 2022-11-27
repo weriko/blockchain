@@ -189,10 +189,11 @@ class Node:
         reactor.run()
 
     def add_node(self, node):
-        ip, port = node[0], node[1]
-        self.node_list.append(node)
-        connect_db.insert_node(ip, port)
-        self.add_explore_node(node)
+        if len(self.node_list)< config.NETWORK_CONSTANTS["node_peers_max"]+1:
+            ip, port = node[0], node[1]
+            self.node_list.append(node)
+            connect_db.insert_node(ip, port)
+            self.add_explore_node(node)
 
     def add_explore_node(self, node):
         ip, port = node[0], node[1]
