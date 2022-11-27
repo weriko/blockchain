@@ -148,7 +148,7 @@ class NodeHandler(protocol.Protocol): #Used when node sends data to other nodes
 class EchoFactory(protocol.ClientFactory):
     protocol = NodeHandler
     
-    def __init__(self,data=None,ip=None,port=None):
+    def __init__(self, data=None, ip=None, port=None):
         self.data = data or "None"
         
 
