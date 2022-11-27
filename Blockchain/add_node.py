@@ -5,6 +5,7 @@ import pickle
 import time
 import sys
 import config
+
 """
 An example client. Run simpleserv.py first before running this.
 """
