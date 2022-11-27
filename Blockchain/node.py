@@ -48,7 +48,7 @@ class NodeAsServer(protocol.Protocol):
 
     def dataReceived(self, data):
 
-       
+        
         data = json.loads(data)
 
         """ except Exception as e:
@@ -113,13 +113,13 @@ class NodeAsServer(protocol.Protocol):
 
             elif action == "add_block":
                 data["received_from_node"] = "1"
-                if received_from_node == "0":  # If the data wasnt received by another node, it will emit the data to the network, otherwise, there is no need to do so as another node would have done it already, hopefully
-                    self.factory.node.transmit_data(
-                        json.dumps(data).encode("ascii"))
-                    print("adding block...")
-                    print(self.factory.node.port)
-                    print(self.factory.node.ip)
-                    print("Transmitting to other nodes...")
+            
+                self.factory.node.transmit_data(
+                json.dumps(data).encode("ascii"))
+                print("adding block...")
+                print(self.factory.node.port)
+                print(self.factory.node.ip)
+                print("Transmitting to other nodes...")
 
 
 # Used when node is acting as a server, receiving information from other nodes to verify, or from others to, for example, add a node to the network
