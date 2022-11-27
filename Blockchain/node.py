@@ -55,6 +55,7 @@ class NodeAsServer(protocol.Protocol):
         except Exception as e:
             print(e)
             self.transport.loseConnection()  # Maybe dont handle this?
+        print(type(data))
         if data.get("broadcast") != "false":
             action = None
 
