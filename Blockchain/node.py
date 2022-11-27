@@ -14,6 +14,7 @@ import time
 import uuid
 import pathlib
 import socket
+from telnetlib import Telnet
 from apscheduler.schedulers.background import BackgroundScheduler
 """
 data model:
@@ -232,8 +233,9 @@ class Node:
             try:
                 if self.ip!=n[0]:
 
-                    f = EchoFactory(data = {"ping":0, "broadcast":"false"},ip=n[0],port=n[1])
-                    t = reactor.connectTCP(n[0], n[1], f)
+                    
+                    with Telnet(n[0], n[1]) as tn:
+                        tn.interact()
                     
                     is_connected.append(True)
                 
