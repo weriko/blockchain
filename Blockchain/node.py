@@ -154,7 +154,7 @@ class EchoFactory(protocol.ClientFactory):
 
     def clientConnectionFailed(self, connector, reason):
         print("Connection failed with node", reason)
-        raise ValueError("connection failed")
+        
        
     
     def clientConnectionLost(self, connector, reason):
@@ -192,9 +192,13 @@ class Node:
 
         
     def remove_node(self, node):
+        print("Node removed_____________________")
         ip, port=  node[0],node[1]
-        self.node_list.remove(node)
         connect_db.remove_node(ip,port)
+        print("Table ")
+        self.node_list.remove(node)
+        print("List")
+        
         
     def get_nodes(self):
         nodes = connect_db.get_nodes()
@@ -268,8 +272,7 @@ class Node:
         print(self.get_nodes())
 
     def update_peers(self):
-        self.ping_and_remove_nodes()
-        self.choose_connect()
+        self.connect_to_peers()
         print("Updating nodes -> ", self.get_nodes())
     def start(self):
         self.connect_to_peers()
