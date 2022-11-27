@@ -75,12 +75,6 @@ class NodeAsServer(protocol.Protocol):
 
             
             self.factory.node.add_node(data["node"])
-
-
-
-
-
-            
             self.factory.node.transmit_data(json.dumps(data).encode("ascii"))
             
             print("adding node...")
@@ -187,12 +181,13 @@ class Node:
         except Exception as e:
             print(e)
             return #Maybe dont handle this?
+        print("data sent", data)
         nodes_seen = data.get("nodes_seen", []) #maybe change to set
         
         for n in self.node_list:
             if n[0] not in nodes_seen:
                 try:
-                    if self.ip!=n[0] or self.port!=n[1]:
+                    if self.ip!=n[0]:
                     
                         f = EchoFactory(data = json.dumps(data).encode("ascii"),  ip=n[0],port=n[1])
                         reactor.connectTCP(n[0], n[1], f)
@@ -204,7 +199,7 @@ class Node:
         is_connected = []
         for n in self.node_list:
             try:
-                if self.ip!=n[0] or self.port!=n[1]:
+                if self.ip!=n[0]:
 
                     f = EchoFactory(data = {"ping":0},ip=n[0],port=n[1])
                     reactor.connectTCP(n[0], n[1], f)
@@ -217,7 +212,7 @@ class Node:
     def ping_and_remove_nodes(self):
          for n in self.node_list:
             try:
-                if self.ip!=n[0] or self.port!=n[1]:
+                if self.ip!=n[0]:
 
                     f = EchoFactory(data = {"ping":0},ip=n[0],port=n[1])
                     reactor.connectTCP(n[0], n[1], f)
