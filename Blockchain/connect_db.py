@@ -1,5 +1,6 @@
 import sqlite3
 
+
 def setup():
     connect = sqlite3.connect("dbs/nodes.db")
     db = connect.cursor()
@@ -18,59 +19,68 @@ def insert_node(ip, port):
     connect = sqlite3.connect("dbs/nodes.db")
     db = connect.cursor()
     try:
-        
-        db.execute(f"INSERT INTO nodes(ip,port) VALUES('{ip}','{port}')") #Fix sql injection, maybe
+
+        # Fix sql injection, maybe
+        db.execute(f"INSERT INTO nodes(ip,port) VALUES('{ip}','{port}')")
         connect.commit()
         db.close()
     except Exception as E:
-        print("insert error: ",E)
-        
+        print("insert error: ", E)
+
         setup()
-            
+
     finally:
         if connect:
             connect.close()
+
 
 def remove_node(ip, port):
     connect = sqlite3.connect("dbs/nodes.db")
     db = connect.cursor()
     try:
-        
-        db.execute(f"DELETE FROM nodes where ip = '{ip}' AND port = '{port}'") #Fix sql injection, maybe
+
+        # Fix sql injection, maybe
+        db.execute(f"DELETE FROM nodes where ip = '{ip}' AND port = '{port}'")
         connect.commit()
         db.close()
     except Exception as E:
-        print("remove node error: ",E)
+        print("remove node error: ", E)
         if 'no such table' in E.args[0]:
             setup()
-            
-    finally:
-        if connect:
-            connect.close()
-def remove_explore_node(ip, port):
-    connect = sqlite3.connect("dbs/nodes.db")
-    db = connect.cursor()
-    try:
-        
-        db.execute(f"DELETE FROM explore_nodes where ip = '{ip}' AND port = '{port}'") #Fix sql injection, maybe
-        connect.commit()
-        db.close()
-    except Exception as E:
-        print("remove explore error: ",E)
-        if 'no such table' in E.args[0]:
-            setup()
-            
+
     finally:
         if connect:
             connect.close()
 
+
+def remove_explore_node(ip, port):
+    connect = sqlite3.connect("dbs/nodes.db")
+    db = connect.cursor()
+    try:
+
+        # Fix sql injection, maybe
+        db.execute(
+            f"DELETE FROM explore_nodes where ip = '{ip}' AND port = '{port}'")
+        connect.commit()
+        db.close()
+    except Exception as E:
+        print("remove explore error: ", E)
+        if 'no such table' in E.args[0]:
+            setup()
+
+    finally:
+        if connect:
+            connect.close()
+
+
 def insert_explore_node(ip, port, connections):
-    
+
     try:
         connect = sqlite3.connect("dbs/nodes.db")
         db = connect.cursor()
         try:
-            db.execute(f"INSERT INTO explore_nodes(ip,port,connections) VALUES('{ip}','{port}', {0})")
+            db.execute(
+                f"INSERT INTO explore_nodes(ip,port,connections) VALUES('{ip}','{port}', {0})")
         except:
             ...
         db.execute(f"""UPDATE explore_nodes
@@ -78,65 +88,62 @@ def insert_explore_node(ip, port, connections):
                     
                 WHERE
                     ip = '{ip}' AND port = '{port}';""")
-                        #Fix sql injection, maybe
+        # Fix sql injection, maybe
         connect.commit()
         db.close()
     except Exception as E:
         print(E)
         setup()
-       
 
-            
     finally:
         if connect:
             connect.close()
 
+
 def explore_nodes():
     connect = sqlite3.connect("dbs/nodes.db")
     db = connect.cursor()
-    try:   
+    try:
         db.execute("SELECT * FROM explore_nodes")
         nodes = []
         for i in db.fetchall():
             nodes.append(i)
 
+        nodes.sort(key=lambda x: x[2])
 
-        nodes.sort(key = lambda x: x[2])
-        
-            
         db.close()
         return nodes
-
 
     except Exception as E:
         print("explore node error ", E)
         setup()
 
+
 def get_nodes():
     connect = sqlite3.connect("dbs/nodes.db")
     db = connect.cursor()
-    try:   
+    try:
         db.execute("SELECT * FROM nodes")
         nodes = []
         for i in db.fetchall():
             nodes.append(i)
-            
+
         db.close()
         return nodes
 
-
     except Exception as E:
         print("get node error", E)
-        
+
         setup()
         print(E)
         return []
-       
+
+
 def view_table(table):
     connect = sqlite3.connect("dbs/nodes.db")
     db = connect.cursor()
     try:
-        
+
         db.execute(f"SELECT * FROM {table}")
         print(db.fetchall())
         for i in db.fetchall():
