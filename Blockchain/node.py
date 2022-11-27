@@ -31,7 +31,7 @@ class NodeAsServer(protocol.Protocol):
     def dataReceived(self, data):
 
         try:
-            print(data)
+
             data = json.loads(data)
         
         except Exception as e:
@@ -182,6 +182,11 @@ class Node:
 
         
     def transmit_data(self, data):
+        try:
+            data = json.loads(data)
+        except Exception as e:
+            print(e)
+            return #Maybe dont handle this?
         nodes_seen = data.get("nodes_seen", []) #maybe change to set
         
         for n in self.node_list:
@@ -189,7 +194,7 @@ class Node:
                 try:
                     if self.ip!=n[0] or self.port!=n[1]:
                     
-                        f = EchoFactory(data = data,ip=n[0],port=n[1])
+                        f = EchoFactory(data = json.dumps(data).encode("ascii"),  ip=n[0],port=n[1])
                         reactor.connectTCP(n[0], n[1], f)
                     
                 except:
