@@ -1,10 +1,10 @@
 import node
 import json
 import sys
-
+import config
 def main():
     with open("nodes.json","r") as nd:
-        port = 9000
+        port = config.NETWORK_CONSTANTS["port"]
         args = sys.argv
         if len(args)>1:
             port = int(args[1])
