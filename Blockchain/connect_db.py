@@ -91,7 +91,7 @@ def insert_explore_node(ip, port, connections):
         if connect:
             connect.close()
 
-def explore_nodes(ip, port):
+def explore_nodes():
     connect = sqlite3.connect("dbs/nodes.db")
     db = connect.cursor()
     try:   
