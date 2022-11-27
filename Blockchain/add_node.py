@@ -4,6 +4,7 @@ import json
 import pickle
 import time
 import sys
+import config
 """
 An example client. Run simpleserv.py first before running this.
 """
@@ -48,18 +49,17 @@ class EchoFactory(protocol.ClientFactory):
 
 # this connects the protocol to a server running on port 8000
 def main():
+    
     f = EchoFactory()
     global node_port #Dont do this
     global node_ip
     node_ip = "localhost"
-    node_port = 9000
-    port = 9000
+    node_port = config.NETWORK_CONSTANTS["port"]
+    port = config.NETWORK_CONSTANTS["port"]
     args = sys.argv
     ip = "localhost"
     if len(args)>1:
-        port = int(args[2])
-        node_port = int(args[4])
-        node_ip = args[3]
+        node_ip = args[2]
         ip = args[1]
     reactor.connectTCP(ip, port, f)
     reactor.run()

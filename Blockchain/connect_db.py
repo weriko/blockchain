@@ -131,6 +131,8 @@ def get_nodes():
     except Exception as E:
         
         setup()
+        print(E)
+        return []
        
 def view_table(table):
     connect = sqlite3.connect("dbs/nodes.db")
