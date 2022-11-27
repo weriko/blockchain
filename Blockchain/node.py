@@ -271,6 +271,7 @@ class Node:
         self.connect_to_peers()
         scheduler = BackgroundScheduler()
         scheduler.add_job(self.testing, 'interval', seconds=5)
+        scheduler.start()
         print("Peers ", self.get_nodes() )
         print(self.id)
         self.start_as_server()
