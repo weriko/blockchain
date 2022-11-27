@@ -46,6 +46,7 @@ class NodeAsServer(protocol.Protocol):
 
     def dataReceived(self, data):
 
+
         try:
 
             data = json.loads(data)
@@ -53,57 +54,57 @@ class NodeAsServer(protocol.Protocol):
         except Exception as e:
             print(e)
             self.transport.loseConnection()#Maybe dont handle this?
+        if data.get("broadcast")!= "false":
+            action=None
 
-        action=None
-
-        if data.get("nodes_seen"):
-            data["nodes_seen"].append(self.factory.node.ip)
-        else:
-            data["nodes_seen"] = [self.factory.node.ip]
-        
-
-
-        try:
-            action = data["action"]
-            received_from_node = data["received_from_node"]
-        except Exception as e:
-            print(e)
-            
-            #self.transport.write(json.dumps(data).encode("ascii"))
-            
-            self.transport.write(b"Protocol error")
-
-        self.transport.write(b"Data received successfully")
-
-
-
-        if action == "request_nodes":
-            enodes = connect_db.explore_nodes()
-            data = {"nodes":enodes}
-            self.transport.write(json.dumps(data).encode("ascii"))
+            if data.get("nodes_seen"):
+                data["nodes_seen"].append(self.factory.node.ip)
+            else:
+                data["nodes_seen"] = [self.factory.node.ip]
             
 
 
-        if action=="add_node":
-            
-            data["received_from_node"] ="1"
-            
-
-            
-            self.factory.node.add_node(data["node"])
-            self.factory.node.transmit_data(json.dumps(data).encode("ascii"))
-            
-            print("adding node...")
-            print("Transmitting data to other nodes...")
+            try:
+                action = data["action"]
+                received_from_node = data["received_from_node"]
+            except Exception as e:
+                print(e)
                 
-        elif action=="add_block":
-            data["received_from_node"] ="1"
-            if received_from_node == "0": #If the data wasnt received by another node, it will emit the data to the network, otherwise, there is no need to do so as another node would have done it already, hopefully
+                #self.transport.write(json.dumps(data).encode("ascii"))
+                
+                self.transport.write(b"Protocol error")
+
+            self.transport.write(b"Data received successfully")
+
+
+
+            if action == "request_nodes":
+                enodes = connect_db.explore_nodes()
+                data = {"nodes":enodes}
+                self.transport.write(json.dumps(data).encode("ascii"))
+                
+
+
+            if action=="add_node":
+                
+                data["received_from_node"] ="1"
+                
+
+                
+                self.factory.node.add_node(data["node"])
                 self.factory.node.transmit_data(json.dumps(data).encode("ascii"))
-                print("adding block...")
-                print(self.factory.node.port)
-                print(self.factory.node.ip)
-                print("Transmitting to other nodes...")
+                
+                print("adding node...")
+                print("Transmitting data to other nodes...")
+                    
+            elif action=="add_block":
+                data["received_from_node"] ="1"
+                if received_from_node == "0": #If the data wasnt received by another node, it will emit the data to the network, otherwise, there is no need to do so as another node would have done it already, hopefully
+                    self.factory.node.transmit_data(json.dumps(data).encode("ascii"))
+                    print("adding block...")
+                    print(self.factory.node.port)
+                    print(self.factory.node.ip)
+                    print("Transmitting to other nodes...")
                
             
         
@@ -192,12 +193,12 @@ class Node:
 
         
     def remove_node(self, node):
-        print("Node removed_____________________")
+        print("removed node", n)
         ip, port=  node[0],node[1]
         connect_db.remove_node(ip,port)
-        print("Table ")
+
         self.node_list.remove(node)
-        print("List")
+   
         
         
     def get_nodes(self):
@@ -231,7 +232,7 @@ class Node:
             try:
                 if self.ip!=n[0]:
 
-                    f = EchoFactory(data = {"ping":0},ip=n[0],port=n[1])
+                    f = EchoFactory(data = {"ping":0, "broadcast":"false"},ip=n[0],port=n[1])
                     reactor.connectTCP(n[0], n[1], f)
                     is_connected.append(True)
                 
@@ -240,15 +241,16 @@ class Node:
         return is_connected   
     
     def ping_and_remove_nodes(self):
-         for n in self.node_list:
-            try:
-                if self.ip!=n[0]:
-
-                    f = EchoFactory(data = {"ping":0},ip=n[0],port=n[1])
-                    reactor.connectTCP(n[0], n[1], f)
-                
-            except:
-                self.remove_node(n)
+         
+        nodes = self.ping_nodes()
+        temp = []
+        for i,n in enumerate(nodes):
+             if not n:
+                 temp.append(self.node_list[i])
+        for n in temp:
+            self.remove_node(n)
+        
+             
 
     def connect_to_peers(self):
         self.ping_and_remove_nodes()
