@@ -238,7 +238,7 @@ class Node:
             try:
                 if self.ip != n[0]:
 
-                    with Telnet(n[0], n[1]) as tn:
+                    with Telnet(n[0], n[1], timeout=0.7) as tn:
                         tn.interact()
 
                     is_connected.append(True)
@@ -282,8 +282,8 @@ class Node:
 
     def start(self):
         self.connect_to_peers()
-        scheduler = BackgroundScheduler(job_defaults={'max_instances': 2})
-        scheduler.add_job(self.update_peers, 'interval', seconds=10)
+        scheduler = BackgroundScheduler(job_defaults={'max_instances': 5})
+        scheduler.add_job(self.update_peers, 'interval', seconds=20+2*len(self.node_list))
         scheduler.start()
         print("Peers ", self.get_nodes())
         print(self.id)
