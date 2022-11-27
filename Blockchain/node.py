@@ -13,7 +13,8 @@ from requests import get
 import time
 import uuid
 import pathlib
-
+import socket
+from apscheduler.schedulers.background import BackgroundScheduler
 """
 data model:
     
@@ -22,7 +23,19 @@ action: which action will be performed in the network ->
     add node, update node, download blockchain, verify mining hash, make transaction, add block
 """
 
-
+#https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(0)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.254.254.254', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
 
 class NodeAsServer(protocol.Protocol):
 
@@ -195,11 +208,11 @@ class Node:
             return #Maybe dont handle this?
         print("data sent", data)
         nodes_seen = data.get("nodes_seen", []) #maybe change to set
-        
+        priv_ip = get_ip()
         for n in self.node_list:
             if n[0] not in nodes_seen:
                 try:
-                    if self.ip!=n[0]:
+                    if self.ip!=n[0] and priv_ip!=n[0]:
                     
                         f = EchoFactory(data = json.dumps(data).encode("ascii"),  ip=n[0],port=n[1])
                         reactor.connectTCP(n[0], n[1], f)
@@ -249,9 +262,15 @@ class Node:
         except:
             nodes = []
         return nodes
+    def testing(self):
+        print("=========THIS IS A TEST=============")
+        print(self.get_nodes())
+
 
     def start(self):
         self.connect_to_peers()
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(self.testing, 'interval', seconds=5)
         print("Peers ", self.get_nodes() )
         print(self.id)
         self.start_as_server()
