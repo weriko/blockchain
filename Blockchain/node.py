@@ -199,7 +199,7 @@ class Node:
         try:
             reactor.run()
         except (KeyboardInterrupt, SystemExit):
-            pass
+            reactor.stop
 
     def add_node(self, node):
         if len(self.node_list)< config.NETWORK_CONSTANTS["node_peers_max"]+1:
