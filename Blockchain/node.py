@@ -45,6 +45,10 @@ def get_ip():
 class NodeAsServer(protocol.Protocol):
 
     def connectionMade(self):
+        def terminate():
+            self.terminateLater = None
+            self.transport.abortConnection()
+        self.terminateLater = reactor.callLater(60 * 1, terminate)
         print("Started")
 
     def dataReceived(self, data):
@@ -136,12 +140,21 @@ class NodeServerFactory(protocol.ServerFactory):
             self.node = Node()
         else:
             self.node = node
+    def connectionMade(self):
+        def terminate():
+            self.terminateLater = None
+            self.transport.abortConnection()
+        self.terminateLater = reactor.callLater(60 * 5, terminate)
 
     def clientConnectionFailed(self, connector, reason):
         print("Connection failed - goodbye!")
 
     def clientConnectionLost(self, connector, reason):
         print("Connection lost - goodbye!")
+        delayedCall = self.terminateLater
+        self.terminateLater = None
+        if delayedCall is not None:
+            delayedCall.cancel()
 
 
 class NodeHandler(protocol.Protocol):  # Used when node sends data to other nodes
@@ -151,6 +164,10 @@ class NodeHandler(protocol.Protocol):  # Used when node sends data to other node
             self.transport.write(self.factory.data.encode())
         except:
             self.transport.write(self.factory.data)
+        def terminate():
+            self.terminateLater = None
+            self.transport.abortConnection()
+        self.terminateLater = reactor.callLater(60 * 5, terminate)
 
     def dataReceived(self, data):
 
@@ -159,6 +176,10 @@ class NodeHandler(protocol.Protocol):  # Used when node sends data to other node
 
     def connectionLost(self, reason):
         print("connection lost")
+        delayedCall = self.terminateLater
+        self.terminateLater = None
+        if delayedCall is not None:
+            delayedCall.cancel()
 
 
 class EchoFactory(protocol.ClientFactory):
@@ -166,12 +187,22 @@ class EchoFactory(protocol.ClientFactory):
 
     def __init__(self, data=None, ip=None, port=None):
         self.data = data or "None"
+    
+    def connectionMade(self):
+        def terminate():
+            self.terminateLater = None
+            self.transport.abortConnection()
+        self.terminateLater = reactor.callLater(60 * 5, terminate)
 
     def clientConnectionFailed(self, connector, reason):
         print("Connection failed with node", reason)
 
     def clientConnectionLost(self, connector, reason):
         print("Connection closed with node", reason)
+        delayedCall = self.terminateLater
+        self.terminateLater = None
+        if delayedCall is not None:
+            delayedCall.cancel()
 
 
 class Node:
@@ -196,7 +227,10 @@ class Node:
 
         reactor.listenTCP(self.port, self.factory)
 
-        reactor.run()
+        try:
+            reactor.run()
+        except (KeyboardInterrupt, SystemExit):
+            pass
 
     def add_node(self, node):
         if len(self.node_list)< config.NETWORK_CONSTANTS["node_peers_max"]+1:
@@ -305,7 +339,7 @@ class Node:
     def start(self):
         self.connect_to_peers()
         scheduler = TwistedScheduler(job_defaults={'max_instances': 10})
-        scheduler.add_job(self.update_peers, 'interval', seconds=30)
+        scheduler.add_job(self.update_peers, 'interval', seconds=60)
         #scheduler.add_job(self.sleep, 'interval', seconds=60)
         scheduler.start()
         print("Peers ", self.get_nodes())
