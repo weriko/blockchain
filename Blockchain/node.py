@@ -286,6 +286,7 @@ class Node:
     def choose_connect(self, num=99):
         enodes = connect_db.explore_nodes()
         n = min(len(enodes), config.NETWORK_CONSTANTS["node_peers"], num)
+        print("lengths n, node_peers, enodes ", n, config.NETWORK_CONSTANTS["node_peers"], len(enodes))
         try:
             # Implement better node selection other than random. maybe
             nodes = random.sample(
