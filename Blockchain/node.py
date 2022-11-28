@@ -232,8 +232,8 @@ class Node:
         try:
             data = json.loads(data)
         except Exception as e:
-            print(e)
-            return  # Maybe dont handle this?
+            ...
+            
         print("data sent", data)
         nodes_seen = data.get("nodes_seen", [])  # maybe change to set
         priv_ip = get_ip()
