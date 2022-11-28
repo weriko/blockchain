@@ -211,9 +211,10 @@ class Node:
         ip, port = node[0], node[1]
 
         connect_db.insert_explore_node(ip, port, 0)
-        data = {"action": "add_node",
+        data = {"action": "add_explore_node",
                 "received_from_node": "0",
                 "node": [ip, port],
+                "nodes_seen" : [self.ip],
                 "timestamp": str(time.time())}
         self.transmit_data(data)
 
