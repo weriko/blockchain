@@ -215,7 +215,7 @@ class Node:
                 "received_from_node": "0",
                 "node": [ip, port],
                 "timestamp": str(time.time())}
-        self.transmmit_data(data)
+        self.transmit_data(data)
 
     def remove_node(self, node):
         print("removed node")
