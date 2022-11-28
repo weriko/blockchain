@@ -21,6 +21,7 @@ class EchoClient(protocol.Protocol):
 
     def connectionMade(self):
         global message
+        print("message sent ->",message)
         global node_ip  # dont use globals
         data = {"action": "message",
                 "received_from_node": "0",
