@@ -302,6 +302,7 @@ class Node:
     def update_peers(self):
         self.connect_to_peers()
         print("Updating nodes -> ", self.get_nodes())
+        print("Node list ->", self.node_list)
         print("Explore nodes ->",connect_db.explore_nodes())
     def sleep(self):
         time.sleep(2)
