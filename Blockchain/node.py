@@ -290,7 +290,7 @@ class Node:
         try:
             # Implement better node selection other than random. maybe
             nodes = random.sample(
-                enodes, config.NETWORK_CONSTANTS["node_peers"] - n)
+                enodes, min(len(enodes),config.NETWORK_CONSTANTS["node_peers"] - n))
         except Exception as e:
             print("Error choosing new nodes ", e)
             nodes = []
