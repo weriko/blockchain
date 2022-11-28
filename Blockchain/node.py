@@ -7,6 +7,7 @@ from twisted.internet import reactor, protocol
 import config
 from apscheduler.schedulers.twisted import TwistedScheduler
 import connect_db
+from bitcoinutils.transactions import Transaction
 import hashlib as hs
 import pickle
 import random
@@ -100,7 +101,20 @@ class NodeAsServer(protocol.Protocol):
                 self.factory.node.add_node(data["node"])
            
                 print("adding node...")
+
+
+            if action == "message_transaction":
+                data["received_from_node"] = "1"
+                try:
+                    tx = Transaction.from_raw(data["message"])
+                    print(tx.__dict__)
+                    self.factory.node.transmit_data(
+                        json.dumps(data).encode("ascii"))
+                except:
+                    print("Transaction not valid! not transmitting")
+
                 
+                print("message received : ", data.get("message"))
 
             if action == "message":
                 data["received_from_node"] = "1"
