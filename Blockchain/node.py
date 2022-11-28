@@ -120,7 +120,7 @@ class NodeAsServer(protocol.Protocol):
                 print(self.factory.node.port)
                 print(self.factory.node.ip)
                 print("Transmitting to other nodes...")
-            self.transport.loseConnection()
+            #self.transport.loseConnection()
 
 
 # Used when node is acting as a server, receiving information from other nodes to verify, or from others to, for example, add a node to the network
@@ -237,7 +237,7 @@ class Node:
             ...
             
         print("data sent", data)
-        nodes_seen = data.get("nodes_seen", [])  # maybe change to set
+        nodes_seen = data.get("nodes_seen", [])  # maybe change to set{}
         priv_ip = get_ip()
         for n in self.node_list:
             if n[0] not in nodes_seen:
