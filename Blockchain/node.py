@@ -96,12 +96,10 @@ class NodeAsServer(protocol.Protocol):
 
             if action == "add_node":
 
-                data["received_from_node"] = "1"
+                
 
                 self.factory.node.add_node(data["node"])
-                #self.factory.node.transmit_data(
-                 #   json.dumps(data).encode("ascii"))
-
+           
                 print("adding node...")
                 
 
@@ -213,6 +211,11 @@ class Node:
         ip, port = node[0], node[1]
 
         connect_db.insert_explore_node(ip, port, 0)
+        data = {"action": "add_node",
+                "received_from_node": "0",
+                "node": [ip, port],
+                "timestamp": str(time.time())}
+        self.transmmit_data(data)
 
     def remove_node(self, node):
         print("removed node")
@@ -298,8 +301,8 @@ class Node:
     def start(self):
         self.connect_to_peers()
         scheduler = BackgroundScheduler(job_defaults={'max_instances': 10})
-        #scheduler.add_job(self.update_peers, 'interval', seconds=60)
-        scheduler.add_job(self.sleep, 'interval', seconds=60)
+        scheduler.add_job(self.update_peers, 'interval', seconds=60)
+        #scheduler.add_job(self.sleep, 'interval', seconds=60)
         scheduler.start()
         print("Peers ", self.get_nodes())
         print(self.id)
