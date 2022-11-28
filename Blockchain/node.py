@@ -50,9 +50,14 @@ class NodeAsServer(protocol.Protocol):
             self.transport.abortConnection()
         self.terminateLater = reactor.callLater(60 * 1, terminate)
         print("Started")
+    def connectionLost(self, reason):
+        delayedCall = self.terminateLater
+        self.terminateLater = None
+        if delayedCall is not None:
+            delayedCall.cancel()
 
     def dataReceived(self, data):
-        reactor.callLater(30, self.transport.loseConnection)
+        reactor.callLater(30, self.transport.abortConnection())
         try:
             data = json.loads(data)
         
@@ -132,6 +137,7 @@ class NodeServerFactory(protocol.ServerFactory):
     protocol = NodeAsServer
 
     def __init__(self, queue=None, node=None):
+        self.terminateLater = None
         if not queue:
             self.queue = []
         else:
@@ -140,21 +146,12 @@ class NodeServerFactory(protocol.ServerFactory):
             self.node = Node()
         else:
             self.node = node
-    def connectionMade(self):
-        def terminate():
-            self.terminateLater = None
-            self.transport.abortConnection()
-        self.terminateLater = reactor.callLater(60 * 5, terminate)
 
     def clientConnectionFailed(self, connector, reason):
         print("Connection failed - goodbye!")
 
     def clientConnectionLost(self, connector, reason):
         print("Connection lost - goodbye!")
-        delayedCall = self.terminateLater
-        self.terminateLater = None
-        if delayedCall is not None:
-            delayedCall.cancel()
 
 
 class NodeHandler(protocol.Protocol):  # Used when node sends data to other nodes
@@ -187,22 +184,14 @@ class EchoFactory(protocol.ClientFactory):
 
     def __init__(self, data=None, ip=None, port=None):
         self.data = data or "None"
-    
-    def connectionMade(self):
-        def terminate():
-            self.terminateLater = None
-            self.transport.abortConnection()
-        self.terminateLater = reactor.callLater(60 * 5, terminate)
+        self.terminateLater = None
 
     def clientConnectionFailed(self, connector, reason):
         print("Connection failed with node", reason)
 
     def clientConnectionLost(self, connector, reason):
         print("Connection closed with node", reason)
-        delayedCall = self.terminateLater
-        self.terminateLater = None
-        if delayedCall is not None:
-            delayedCall.cancel()
+
 
 
 class Node:
