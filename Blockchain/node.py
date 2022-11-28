@@ -46,18 +46,20 @@ class NodeAsServer(protocol.Protocol):
 
     def connectionMade(self):
         def terminate():
-            self.terminateLater = None
-            self.transport.abortConnection()
+            try:
+                self.transport.abortConnection()
+            except:
+                ...
         self.terminateLater = reactor.callLater(60 * 1, terminate)
         print("Started")
-    def connectionLost(self, reason):
-        delayedCall = self.terminateLater
-        self.terminateLater = None
-        if delayedCall is not None:
-            delayedCall.cancel()
 
     def dataReceived(self, data):
-        reactor.callLater(30, self.transport.abortConnection())
+        def terminate():
+            try:
+                self.transport.abortConnection()
+            except:
+                ...
+        reactor.callLater(30, terminate)
         try:
             data = json.loads(data)
         
@@ -161,10 +163,7 @@ class NodeHandler(protocol.Protocol):  # Used when node sends data to other node
             self.transport.write(self.factory.data.encode())
         except:
             self.transport.write(self.factory.data)
-        def terminate():
-            self.terminateLater = None
-            self.transport.abortConnection()
-        self.terminateLater = reactor.callLater(60 * 5, terminate)
+
 
     def dataReceived(self, data):
 
@@ -173,10 +172,7 @@ class NodeHandler(protocol.Protocol):  # Used when node sends data to other node
 
     def connectionLost(self, reason):
         print("connection lost")
-        delayedCall = self.terminateLater
-        self.terminateLater = None
-        if delayedCall is not None:
-            delayedCall.cancel()
+  
 
 
 class EchoFactory(protocol.ClientFactory):
@@ -184,7 +180,7 @@ class EchoFactory(protocol.ClientFactory):
 
     def __init__(self, data=None, ip=None, port=None):
         self.data = data or "None"
-        self.terminateLater = None
+        
 
     def clientConnectionFailed(self, connector, reason):
         print("Connection failed with node", reason)
