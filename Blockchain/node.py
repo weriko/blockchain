@@ -87,7 +87,7 @@ class NodeAsServer(protocol.Protocol):
 
                 data["received_from_node"] = "1"
 
-                self.factory.node.add_explore_node(data["node"])
+                self.factory.node.add_explore_node(data["node"], transmit = False)
                 self.factory.node.transmit_data(
                     json.dumps(data).encode("ascii"))
 
@@ -121,7 +121,7 @@ class NodeAsServer(protocol.Protocol):
                 print(self.factory.node.port)
                 print(self.factory.node.ip)
                 print("Transmitting to other nodes...")
-            self.transport.loseConnection()
+        self.transport.loseConnection()
 
 
 # Used when node is acting as a server, receiving information from other nodes to verify, or from others to, for example, add a node to the network
@@ -207,16 +207,17 @@ class Node:
             connect_db.insert_node(ip, port)
         self.add_explore_node(node)
 
-    def add_explore_node(self, node):
+    def add_explore_node(self, node, transmit = True):
         ip, port = node[0], node[1]
 
         connect_db.insert_explore_node(ip, port, 0)
-        data = {"action": "add_explore_node",
-                "received_from_node": "0",
-                "node": [ip, port],
-                "nodes_seen" : [self.ip],
-                "timestamp": str(time.time())}
-        self.transmit_data(data)
+        if transmit:
+            data = {"action": "add_explore_node",
+                    "received_from_node": "0",
+                    "node": [ip, port],
+                    "nodes_seen" : [self.ip],
+                    "timestamp": str(time.time())}
+            self.transmit_data(data)
 
     def remove_node(self, node):
         print("removed node")
