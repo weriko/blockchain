@@ -47,9 +47,12 @@ class NodeAsServer(protocol.Protocol):
         print("Started")
 
     def dataReceived(self, data):
-
         
-        data = json.loads(data)
+
+        try:
+            data = json.loads(data)
+        except:
+            return
 
         """ except Exception as e:
             print(e)
