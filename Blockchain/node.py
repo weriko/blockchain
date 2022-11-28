@@ -202,9 +202,9 @@ class Node:
         
         if len(self.node_list)< config.NETWORK_CONSTANTS["node_peers_max"]+1:
             ip, port = node[0], node[1]
-            if node not in self.node_list:
-                self.node_list.append(node) #fix this for efficiency
+            
             connect_db.insert_node(ip, port)
+            self.node_list = connect_db.get_nodes()
             self.add_explore_node(node)
 
     def add_explore_node(self, node):
@@ -223,7 +223,7 @@ class Node:
         ip, port = node[0], node[1]
         connect_db.remove_node(ip, port)
 
-        self.node_list.remove(node)
+        self.node_list = connect_db.get_nodes()
 
     def get_nodes(self):
         nodes = connect_db.get_nodes()
@@ -245,7 +245,7 @@ class Node:
 
                         f = EchoFactory(data=json.dumps(data).encode(
                             "ascii"),  ip=n[0], port=n[1])
-                        reactor.connectTCP(n[0], n[1], f)
+                        reactor.connectTCP(n[0], n[1], f, timeout=10)
 
                 except:
                     pass

@@ -65,7 +65,7 @@ def main():
         ip = args[1]
     reactor.connectTCP(ip, port, f)
     reactor.run()
-    input()
+  
 
 
 # this only runs if the module was *not* imported
