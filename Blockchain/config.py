@@ -1,5 +1,5 @@
 NETWORK_CONSTANTS = {
-    "node_peers":3,
+    "node_peers":7,
     "port":9427,
     "node_peers_max":15
 }
