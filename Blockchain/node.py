@@ -68,7 +68,6 @@ class NodeAsServer(protocol.Protocol):
 
             try:
                 action = data["action"]
-                received_from_node = data["received_from_node"]
             except Exception as e:
                 print(e)
 
@@ -233,6 +232,7 @@ class Node:
         try:
             data = json.loads(data)
         except Exception as e:
+            print(e)
             ...
             
         print("data sent", data)
@@ -247,8 +247,8 @@ class Node:
                             "ascii"),  ip=n[0], port=n[1])
                         reactor.connectTCP(n[0], n[1], f, timeout=10)
 
-                except:
-                    pass
+                except Exception as e:
+                    print(e)
 
     def ping_nodes(self):
         is_connected = []
