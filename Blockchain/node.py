@@ -45,21 +45,10 @@ def get_ip():
 class NodeAsServer(protocol.Protocol):
 
     def connectionMade(self):
-        def terminate():
-            try:
-                self.transport.abortConnection()
-            except:
-                ...
-        self.terminateLater = reactor.callLater(60 * 1, terminate)
         print("Started")
 
     def dataReceived(self, data):
-        def terminate():
-            try:
-                self.transport.abortConnection()
-            except:
-                ...
-        reactor.callLater(30, terminate)
+        reactor.callLater(30, self.transport.loseConnection)
         try:
             data = json.loads(data)
         
@@ -139,7 +128,6 @@ class NodeServerFactory(protocol.ServerFactory):
     protocol = NodeAsServer
 
     def __init__(self, queue=None, node=None):
-        self.terminateLater = None
         if not queue:
             self.queue = []
         else:
@@ -164,7 +152,6 @@ class NodeHandler(protocol.Protocol):  # Used when node sends data to other node
         except:
             self.transport.write(self.factory.data)
 
-
     def dataReceived(self, data):
 
         print("Server said:", data)
@@ -172,7 +159,6 @@ class NodeHandler(protocol.Protocol):  # Used when node sends data to other node
 
     def connectionLost(self, reason):
         print("connection lost")
-  
 
 
 class EchoFactory(protocol.ClientFactory):
@@ -180,14 +166,12 @@ class EchoFactory(protocol.ClientFactory):
 
     def __init__(self, data=None, ip=None, port=None):
         self.data = data or "None"
-        
 
     def clientConnectionFailed(self, connector, reason):
         print("Connection failed with node", reason)
 
     def clientConnectionLost(self, connector, reason):
         print("Connection closed with node", reason)
-
 
 
 class Node:
