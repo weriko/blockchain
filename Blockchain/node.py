@@ -245,7 +245,7 @@ class Node:
 
                         f = EchoFactory(data=json.dumps(data).encode(
                             "ascii"),  ip=n[0], port=n[1])
-                        reactor.connectTCP(n[0], n[1], f, timeout=10)
+                        reactor.connectTCP(n[0], n[1], f)
 
                 except Exception as e:
                     print(e)
