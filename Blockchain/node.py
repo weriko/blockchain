@@ -5,6 +5,7 @@ from __future__ import print_function
 import json
 from twisted.internet import reactor, protocol
 import config
+from apscheduler.schedulers.twisted import TwistedScheduler
 import connect_db
 import hashlib as hs
 import pickle
@@ -303,8 +304,8 @@ class Node:
         time.sleep(2)
     def start(self):
         self.connect_to_peers()
-        scheduler = BackgroundScheduler(job_defaults={'max_instances': 10})
-        scheduler.add_job(self.update_peers, 'interval', seconds=60)
+        scheduler = TwistedScheduler(job_defaults={'max_instances': 10})
+        scheduler.add_job(self.update_peers, 'interval', seconds=30)
         #scheduler.add_job(self.sleep, 'interval', seconds=60)
         scheduler.start()
         print("Peers ", self.get_nodes())
