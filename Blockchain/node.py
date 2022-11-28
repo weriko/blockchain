@@ -47,7 +47,7 @@ class NodeAsServer(protocol.Protocol):
         print("Started")
 
     def dataReceived(self, data):
-        reactor.callLater(120, self.transport.loseConnection)
+        reactor.callLater(30, self.transport.loseConnection)
         try:
             data = json.loads(data)
         
