@@ -200,13 +200,12 @@ class Node:
         reactor.run()
 
     def add_node(self, node):
-        
         if len(self.node_list)< config.NETWORK_CONSTANTS["node_peers_max"]+1:
             ip, port = node[0], node[1]
             if node not in self.node_list:
                 self.node_list.append(node) #fix this for efficiency
             connect_db.insert_node(ip, port)
-            self.add_explore_node(node)
+        self.add_explore_node(node)
 
     def add_explore_node(self, node):
         ip, port = node[0], node[1]
@@ -291,13 +290,15 @@ class Node:
             # Implement better node selection other than random. maybe
             nodes = random.sample(
                 enodes, config.NETWORK_CONSTANTS["node_peers"] - n)
-        except:
+        except Exception as e:
+            print("Error choosing new nodes ", e)
             nodes = []
         return nodes
 
     def update_peers(self):
         self.connect_to_peers()
         print("Updating nodes -> ", self.get_nodes())
+        print("Explore nodes ->",connect_db.explore_nodes())
     def sleep(self):
         time.sleep(2)
     def start(self):
