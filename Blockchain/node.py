@@ -68,6 +68,7 @@ class NodeAsServer(protocol.Protocol):
 
             try:
                 action = data["action"]
+                received_from_node = data["received_from_node"]
             except Exception as e:
                 print(e)
 
@@ -120,7 +121,6 @@ class NodeAsServer(protocol.Protocol):
                 print(self.factory.node.port)
                 print(self.factory.node.ip)
                 print("Transmitting to other nodes...")
-            #self.transport.loseConnection()
 
 
 # Used when node is acting as a server, receiving information from other nodes to verify, or from others to, for example, add a node to the network
@@ -202,9 +202,9 @@ class Node:
         
         if len(self.node_list)< config.NETWORK_CONSTANTS["node_peers_max"]+1:
             ip, port = node[0], node[1]
-            
+            if node not in self.node_list:
+                self.node_list.append(node) #fix this for efficiency
             connect_db.insert_node(ip, port)
-            self.node_list = connect_db.get_nodes()
             self.add_explore_node(node)
 
     def add_explore_node(self, node):
@@ -223,7 +223,7 @@ class Node:
         ip, port = node[0], node[1]
         connect_db.remove_node(ip, port)
 
-        self.node_list = connect_db.get_nodes()
+        self.node_list.remove(node)
 
     def get_nodes(self):
         nodes = connect_db.get_nodes()
@@ -233,11 +233,10 @@ class Node:
         try:
             data = json.loads(data)
         except Exception as e:
-            print(e)
             ...
             
         print("data sent", data)
-        nodes_seen = data.get("nodes_seen", [])  # maybe change to set{}
+        nodes_seen = data.get("nodes_seen", [])  # maybe change to set
         priv_ip = get_ip()
         for n in self.node_list:
             if n[0] not in nodes_seen:
@@ -247,10 +246,9 @@ class Node:
                         f = EchoFactory(data=json.dumps(data).encode(
                             "ascii"),  ip=n[0], port=n[1])
                         reactor.connectTCP(n[0], n[1], f)
-                        
 
-                except Exception as e:
-                    print(e)
+                except:
+                    pass
 
     def ping_nodes(self):
         is_connected = []
